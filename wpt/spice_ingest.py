@@ -3,7 +3,6 @@ LTspice / PLECS Transient Waveform Ingest Engine.
 Extracts fundamental frequency phasors (V1, I1, phase) from raw switched time-series data.
 """
 from dataclasses import dataclass
-from typing import Dict, Tuple
 import numpy as np
 
 
