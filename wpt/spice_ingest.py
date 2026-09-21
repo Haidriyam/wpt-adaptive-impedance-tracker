@@ -38,27 +38,27 @@ class SpiceWaveformParser:
         v_ss = v_primary_array[steady_idx:]
         i_ss = i_primary_array[steady_idx:]
 
-        # Integration basis functions
+        # Basis functions for projection
         sin_basis = np.sin(self.omega * t_ss)
         cos_basis = np.cos(self.omega * t_ss)
 
-        # Numerical integration (trapezoidal quadrature)
         dt = np.mean(np.diff(t_ss))
         total_time = t_ss[-1] - t_ss[0]
 
-        # Voltage Fourier coefficients
+        # Voltage Fourier quadrature: v(t) = v_real * cos(wt) + v_imag * sin(wt)
         v_real = (2.0 / total_time) * np.sum(v_ss * cos_basis) * dt
         v_imag = (2.0 / total_time) * np.sum(v_ss * sin_basis) * dt
         v_mag_peak = np.sqrt(v_real**2 + v_imag**2)
-        v_phase_rad = np.arctan2(v_imag, v_real)
+        # In cosine form cos(wt + theta), theta = atan2(-imag, real)
+        v_phase_rad = np.arctan2(-v_imag, v_real)
 
-        # Current Fourier coefficients
+        # Current Fourier quadrature
         i_real = (2.0 / total_time) * np.sum(i_ss * cos_basis) * dt
         i_imag = (2.0 / total_time) * np.sum(i_ss * sin_basis) * dt
         i_mag_peak = np.sqrt(i_real**2 + i_imag**2)
-        i_phase_rad = np.arctan2(i_imag, i_real)
+        i_phase_rad = np.arctan2(-i_imag, i_real)
 
-        # Compute relative impedance phase displacement
+        # Relative impedance phase displacement: phi = angle(V) - angle(I)
         delta_phase_deg = float(np.degrees(v_phase_rad - i_phase_rad))
 
         # Normalize phase to [-180, 180]
